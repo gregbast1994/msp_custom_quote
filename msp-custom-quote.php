@@ -8,7 +8,6 @@
  class MSP_Custom_Quote {
 
     public static $endpoint = 'custom-quote';
-    public static $rqf_id;
 
     function __construct(){
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_can_customize_product_meta_box' ) );
@@ -28,7 +27,8 @@
         if ( ! is_wp_error( $img_id ) ) {
             $this->send_rfq_to_admin( get_attached_file( $img_id ), $_POST );
         } else {
-            // error we need image.
+            // http://hookr.io/functions/wc_add_notice/
+           wp_redirect( $_POST['_wp_http_referer'] );
         }
     }
 
@@ -38,20 +38,25 @@
         if( ! $product ) return;
 
         $to = $data['email'];
-        $subject = "RFQ - " . $product->get_name();
+        $subject = "RFQ - " . $data['company'];
         $headers = array('Content-Type: text/html; charset=UTF-8');
 
         ob_start();
         ?>
-            <h1>Kustom Klever Kutters - RFQ</h1>
+            <h1><?php echo $subject ?></h1>
             <p>Quantity: <?php echo $data['qty'] ?></p>
-            <p>Image: <?php echo $attachment ?></p>
+            <p>Image ( also attached ): <?php echo $attachment ?></p>
+            <p>Tagline: <?php echo $data['tagline'] ?></p>
+
+            <hr>
 
             <h3>Ship to: </h3>
+            <p>Company Name: <?php echo $data['company'] ?></p>
             <p>Street: <?php echo $data['street'] ?></p>
             <p>Zip: <?php echo $data['zip'] ?></p>
 
             <p>Reply To: <?php echo $data['email'] ?></p>
+            <p>Phone: <?php echo $data['phone'] ?></p>
         <?php
         $html = ob_get_clean();
         echo $html;
