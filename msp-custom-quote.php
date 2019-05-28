@@ -8,24 +8,65 @@
  class MSP_Custom_Quote {
 
     public static $endpoint = 'custom-quote';
+    public static $rqf_id;
 
     function __construct(){
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_can_customize_product_meta_box' ) );
         add_action( 'woocommerce_process_product_meta', array( $this, 'add_can_customize_product_meta_save') );
 
-        add_action( 'woocommerce_template_single_excerpt', array( $this, 'maybe_add_custom_quote_link' ) );
+        add_action( 'woocommerce_single_product_summary', array( $this, 'maybe_add_custom_quote_link' ), 35 );
+        add_action( 'admin_post_msp_process_custom_quote', array( $this, 'process_rfq' ) );
+    }
+
+    public function process_rfq(){
+        if( ! check_admin_referer( 'process-quote-' . $_POST['product_id'] ) ) return;
+
+        if( isset( $_FILES['file'] ) ){
+            $img_id = media_handle_upload( 'file', 0, array( 'post_name' => 'rfq_' . $_POST['product_id'] . '_' . $_POST['email']) );
+        }
+
+        if ( ! is_wp_error( $img_id ) ) {
+            $this->send_rfq_to_admin( get_attached_file( $img_id ), $_POST );
+        } else {
+            // error we need image.
+        }
+    }
+
+    public function send_rfq_to_admin( $attachment, $data ){
+        $product = wc_get_product( $data['product_id'] );
+        
+        if( ! $product ) return;
+
+        $to = $data['email'];
+        $subject = "RFQ - " . $product->get_name();
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+
+        ob_start();
+        ?>
+            <h1>Kustom Klever Kutters - RFQ</h1>
+            <p>Quantity: <?php echo $data['qty'] ?></p>
+            <p>Image: <?php echo $attachment ?></p>
+
+            <h3>Ship to: </h3>
+            <p>Street: <?php echo $data['street'] ?></p>
+            <p>Zip: <?php echo $data['zip'] ?></p>
+
+            <p>Reply To: <?php echo $data['email'] ?></p>
+        <?php
+        $html = ob_get_clean();
+        echo $html;
+        
+        wp_mail( $to, $subject, $html, $headers, $attachment );
     }
 
     public function add_can_customize_product_meta_box(){
         echo '<div class="option_group">';
 
-        woocommerce_wp_checkbox( 
-            array( 
-                'id'            => '_msp_can_customize', 
-                'wrapper_class' => '', 
-                'label'         => __('Can this product be customized?', 'msp-sc' ), 
-                )
-            );
+        woocommerce_wp_checkbox( array( 
+            'id'            => '_msp_can_customize', 
+            'wrapper_class' => '', 
+            'label'         => __('Can this product be customized?', 'msp-sc' ), 
+        ) );
 
         echo '</div>';
     }
@@ -36,10 +77,13 @@
     }
 
     public function maybe_add_custom_quote_link(){
-        $can_customize = get_post_meta( get_the_post_ID(), '_msp_can_customize', true );
-        if( $can_customize ){
-            echo 'can customize';
+        $can_customize = get_post_meta( get_the_ID(), '_msp_can_customize', true );
+        $url = site_url() . '/' . self::$endpoint . '?product_id=' . get_the_ID();
+        $message = 'Custom Branding Stickers - Request for Quote';
+        if( $can_customize == 'yes' ){
+            echo sprintf( '<a href="%s">%s</a>', $url, $message );
         }
+        
     }
 
     public function get_custom_quote_form(){
