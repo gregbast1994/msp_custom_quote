@@ -95,7 +95,7 @@
         return ( $wpdb->get_row("SELECT post_name FROM $wpdb->posts WHERE post_name = '" . $post_name . "'", 'ARRAY_A') );
     }
 
-    public static function insall(){
+    public static function install(){
         if( ! self::the_slug_exists( self::$endpoint ) ){
             $shortcode = str_replace( '-', '_', self::$endpoint );
             wp_insert_post( array(
