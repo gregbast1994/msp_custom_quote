@@ -5,19 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $product = wc_get_product( $_GET['product_id'] );
-
 if( empty( $product ) ) return;
 
 ?>
-<style>
-#msp_custom_quote_form_preview img{
-    width: auto;
-}
-
-#msp_custom_quote_form #ship-to input{
-    margin-bottom: 1rem;
-}
-</style>
 
     <div id="msp_custom_quote_form_preview" class="border-bottom">
         <div class="d-flex align-items-end">
@@ -31,11 +21,11 @@ if( empty( $product ) ) return;
     <form id="msp_custom_quote_form" method="POST" action="<?php echo admin_url( 'admin-post.php' ) ?>" enctype="multipart/form-data">
         <div class="form-group">
             <label for="qty">Quantity: ( 100 piece minimum )</label>
-            <input id="qty" name="qty" type="number" min="100" class="input-text qty text" style="width: 100px" />
+            <input id="qty" name="qty" type="number" min=100 value=100 class="input-text qty text" style="width: 100px" />
         </div>
 
         <div class="form-group">
-            <label for="image">Logo/Image: ( .ai, .eps, .pdf, .jpg, .png, etc. )</label>
+            <label for="image">Logo/Image: ( .pdf, .jpg, .png, etc. )</label>
             <input id="image" name="file" type="file"/>
         </div>
 
@@ -74,5 +64,15 @@ if( empty( $product ) ) return;
 
         <input type="submit" value="Submit RFQ" class="btn btn-success" />
     </form>
+
+    <style>
+        #msp_custom_quote_form_preview img{
+            width: auto;
+        }
+
+        #msp_custom_quote_form #ship-to input{
+            margin-bottom: 1rem;
+        }
+    </style>
 <?php
 

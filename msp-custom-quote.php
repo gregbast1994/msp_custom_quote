@@ -10,32 +10,35 @@
     public static $endpoint = 'custom-quote';
 
     function __construct(){
+
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_can_customize_product_meta_box' ) );
         add_action( 'woocommerce_process_product_meta', array( $this, 'add_can_customize_product_meta_save') );
 
         add_action( 'woocommerce_single_product_summary', array( $this, 'maybe_add_custom_quote_link' ), 35 );
+
         add_action( 'admin_post_msp_process_custom_quote', array( $this, 'process_rfq' ) );
+        add_action( 'admin_post_nopriv_msp_process_custom_quote', array( $this, 'process_rfq' ) );
+
     }
 
     public function process_rfq(){
-        if( ! check_admin_referer( 'process-quote-' . $_POST['product_id'] ) ) return;
+        if( ! wp_verify_nonce( 'process-quote-' . $_POST['product_id'] ) ){
+            if( isset( $_FILES['file'] ) ){
+                $img_id = media_handle_upload( 'file', 0, array( 'post_name' => 'rfq_' . $_POST['product_id'] . '_' . $_POST['email']) );
+            }
 
-        if( isset( $_FILES['file'] ) ){
-            $img_id = media_handle_upload( 'file', 0, array( 'post_name' => 'rfq_' . $_POST['product_id'] . '_' . $_POST['email']) );
-        }
-
-        if ( ! is_wp_error( $img_id ) ) {
-            $this->send_rfq_to_admin( get_attached_file( $img_id ), $_POST );
-        } else {
-            // http://hookr.io/functions/wc_add_notice/
-           wp_redirect( $_POST['_wp_http_referer'] );
+            if ( ! is_wp_error( $img_id ) ) {
+                $this->send_rfq_to_admin( get_attached_file( $img_id ), $_POST );
+            } else {
+                wp_redirect( $_POST['_wp_http_referer'] );
+            }
         }
     }
 
     public function send_rfq_to_admin( $attachment, $data ){
         $product = wc_get_product( $data['product_id'] );
         
-        if( ! $product ) return;
+        if( empty( $product ) ) return;
 
         $to = $data['email'];
         $subject = "RFQ - " . $data['company'];
@@ -59,10 +62,12 @@
             <p>Phone: <?php echo $data['phone'] ?></p>
         <?php
         $html = ob_get_clean();
-        echo $html;
-        
         wp_mail( $to, $subject, $html, $headers, $attachment );
+        wp_redirect( $product->get_permalink() );
+        exit;
     }
+
+
 
     public function add_can_customize_product_meta_box(){
         echo '<div class="option_group">';
