@@ -47,6 +47,7 @@
         ob_start();
         ?>
             <h1><?php echo $subject ?></h1>
+            <p>Product: <?php echo $product->get_name(); ?></p>
             <p>Quantity: <?php echo $data['qty'] ?></p>
             <p>Image ( also attached ): <?php echo $attachment ?></p>
             <p>Tagline: <?php echo $data['tagline'] ?></p>
