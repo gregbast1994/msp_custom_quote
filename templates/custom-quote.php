@@ -7,9 +7,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 $product = wc_get_product( $_GET['product_id'] );
 if( empty( $product ) ) return;
 
-?>
-
-    <div id="msp_custom_quote_form_preview" class="border-bottom">
+?>  
+    <div class="mb-2 border-bottom" style="padding: 1rem 0;">
+        <h5>Details:</h5>
+        <ul>
+            <li>Minimum 100 pieces</li>
+            <li>Free artwork and set up if quality artwork provided.</li>
+            <li>Takes approximately 10 days to deliver final product</li>
+            <li>Expect a response in 1-2 business days</li>
+        </ul>
+    </div>
+    <div id="msp_custom_quote_form_preview" class="">
         <div class="d-flex align-items-end">
             <?php echo $product->get_image( 'woocommerce_gallery_thumbnail' ) ?>
             <h5 class="m-0 p-0">
@@ -17,7 +25,6 @@ if( empty( $product ) ) return;
             </h5>
         </div>
     </div>
-
     <form id="msp_custom_quote_form" method="POST" action="<?php echo admin_url( 'admin-post.php' ) ?>" enctype="multipart/form-data">
         <div class="form-group">
             <label for="qty">Quantity: ( 100 piece minimum )</label>
@@ -72,6 +79,10 @@ if( empty( $product ) ) return;
 
         #msp_custom_quote_form #ship-to input{
             margin-bottom: 1rem;
+        }
+
+        .border-bottom{
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
     </style>
 <?php

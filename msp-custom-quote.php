@@ -62,6 +62,7 @@
             <p>Phone: <?php echo $data['phone'] ?></p>
         <?php
         $html = ob_get_clean();
+        wp_mail( get_bloginfo( 'admin_email' ), $subject, $html, $headers, $attachment );
         wp_mail( $to, $subject, $html, $headers, $attachment );
         wp_redirect( $product->get_permalink() );
         exit;
@@ -89,7 +90,7 @@
     public function maybe_add_custom_quote_link(){
         $can_customize = get_post_meta( get_the_ID(), '_msp_can_customize', true );
         $url = site_url() . '/' . self::$endpoint . '?product_id=' . get_the_ID();
-        $message = 'Custom Branding Stickers - Request for Quote';
+        $message = 'Kustom Klever Kutter Branding Sticker RFQ';
         if( $can_customize == 'yes' ){
             echo sprintf( '<a href="%s">%s</a>', $url, $message );
         }
