@@ -37,7 +37,7 @@
 
     public function send_rfq_to_admin( $attachment, $data ){
         $product = wc_get_product( $data['product_id'] );
-        
+
         if( empty( $product ) ) return;
 
         $to = $data['email'];
@@ -74,10 +74,10 @@
     public function add_can_customize_product_meta_box(){
         echo '<div class="option_group">';
 
-        woocommerce_wp_checkbox( array( 
-            'id'            => '_msp_can_customize', 
-            'wrapper_class' => '', 
-            'label'         => __('Can this product be customized?', 'msp-sc' ), 
+        woocommerce_wp_checkbox( array(
+            'id'            => '_msp_can_customize',
+            'wrapper_class' => '',
+            'label'         => __('Can this product be customized?', 'msp-sc' ),
         ) );
 
         echo '</div>';
@@ -88,14 +88,14 @@
         update_post_meta( $post_id, '_msp_can_customize', $woocommerce_checkbox );
     }
 
-    public function maybe_add_custom_quote_link(){
+    public static function maybe_add_custom_quote_link(){
         $can_customize = get_post_meta( get_the_ID(), '_msp_can_customize', true );
         $url = site_url() . '/' . self::$endpoint . '?product_id=' . get_the_ID();
         $message = 'Kustom Klever Kutter Branding Sticker RFQ';
         if( $can_customize == 'yes' ){
-            echo sprintf( '<a href="%s">%s</a>', $url, $message );
+            echo sprintf( '<a href="%s" style="font-size: 24px; text-decoration: underline;">%s</a>', $url, $message );
         }
-        
+
     }
 
     public function get_custom_quote_form(){
@@ -123,6 +123,17 @@
 
 new MSP_Custom_Quote();
 
+// add link to end of description tab
+add_filter( 'woocommerce_product_tabs', 'msp_custom_description_tab', 98 );
+function msp_custom_description_tab( $tabs ){
+  $tabs['description']['callback'] = 'msp_add_custom_quote_link_to_description_tab'; // Custom description callback
+  return $tabs;
+}
+
+function msp_add_custom_quote_link_to_description_tab(){
+  woocommerce_product_description_tab();
+  MSP_Custom_Quote::maybe_add_custom_quote_link();
+}
+
 register_activation_hook( __FILE__, array('MSP_Custom_Quote', 'install') );
 add_shortcode( str_replace( '-', '_', MSP_Custom_Quote::$endpoint ), array( 'MSP_Custom_Quote', 'get_custom_quote_form' ) );
- 
