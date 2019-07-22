@@ -102,7 +102,7 @@
         wc_get_template( 'custom-quote.php', array(), '', __DIR__ . '/templates/' );
     }
 
-    public function the_slug_exists( $post_name ) {
+    public static function the_slug_exists( $post_name ) {
         global $wpdb;
         return ( $wpdb->get_row("SELECT post_name FROM $wpdb->posts WHERE post_name = '" . $post_name . "'", 'ARRAY_A') );
     }
