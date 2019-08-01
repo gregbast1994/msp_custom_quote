@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-$product = wc_get_product( $_GET['product_id'] );
+$product = isset( $_GET['product_id'] ) ? wc_get_product( $_GET['product_id'] ) : '';
 if( empty( $product ) ) return;
 
 ?>  
@@ -49,6 +49,9 @@ if( empty( $product ) ) return;
         
         <h6>Ship To:</h6>
         <div id="ship-to" class="form-group">
+            <label>Your name</label>
+            <input type="text" id="name" name="name" />
+
             <label>Company</label>
             <input type="text" id="company" name="company" />
 

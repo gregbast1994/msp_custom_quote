@@ -11,7 +11,7 @@
 
     function __construct(){
 
-        add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_can_customize_product_meta_box' ) );
+        add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_can_customize_product_meta_box' ), 100 );
         add_action( 'woocommerce_process_product_meta', array( $this, 'add_can_customize_product_meta_save') );
 
         add_action( 'woocommerce_single_product_summary', array( $this, 'maybe_add_custom_quote_link' ), 35 );
@@ -55,6 +55,7 @@
             <hr>
 
             <h3>Ship to: </h3>
+            <p>My Name: <?php echo $data['name'] ?></p>
             <p>Company Name: <?php echo $data['company'] ?></p>
             <p>Street: <?php echo $data['street'] ?></p>
             <p>Zip: <?php echo $data['zip'] ?></p>
@@ -98,7 +99,7 @@
 
     }
 
-    public function get_custom_quote_form(){
+    public static function get_custom_quote_form(){
         wc_get_template( 'custom-quote.php', array(), '', __DIR__ . '/templates/' );
     }
 
@@ -126,7 +127,7 @@ new MSP_Custom_Quote();
 // add link to end of description tab
 add_filter( 'woocommerce_product_tabs', 'msp_custom_description_tab', 98 );
 function msp_custom_description_tab( $tabs ){
-  $tabs['description']['callback'] = 'msp_add_custom_quote_link_to_description_tab'; // Custom description callback
+//   $tabs['description']['callback'] = 'msp_add_custom_quote_link_to_description_tab'; // Custom description callback
   return $tabs;
 }
 
